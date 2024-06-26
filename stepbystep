@@ -34,4 +34,8 @@ AWS Infrastructure apply successfully through Github Actions
 
 Next Creating a Github Actions Job to Destroy AWS Infrastructure we just deploy
 
+Next Creating  a Github Actions Job to create an amazon ECR Repository
+copy the reference file in aosnote and paste it in Deploy_pipeline file
+
+
 
