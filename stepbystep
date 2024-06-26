@@ -1,0 +1,3 @@
+Create github repository to store our application code
+Clone the github repository to our pc
+Open the repository with VS and update the .gitignore file with the reference.
