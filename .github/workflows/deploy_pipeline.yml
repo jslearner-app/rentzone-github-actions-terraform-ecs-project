@@ -173,7 +173,7 @@ jobs:
 
 
  # Start self-hosted EC2 runner job
- start_runner:
+  start_runner:
     name: Start self-hosted EC2 runner
     needs: 
       - configure_aws_credentials # Ensure this job runs after AWS credentials are configured
