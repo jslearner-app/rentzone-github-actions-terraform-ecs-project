@@ -37,8 +37,37 @@ Next Creating a Github Actions Job to Destroy AWS Infrastructure we just deploy
 Next Creating  a Github Actions Job to create an amazon ECR Repository
 copy the reference file in aosnote and paste it in Deploy_pipeline file
 
-Next creating a Self-Hosted Runner
+*** Next creating a Self-Hosted Runner ***
 firsly launch an Amazon Linux 2 EC2 Instance in public subnet use the default vpc in the Management Console.
+no subnet because our default vpc has only public subnet and we need to create security group and open port 22 and source myip
+
+Next SSH into an EC2 Instance
+We have SSH into an EC2 instance successful 
+
+Next Install docker and github on the EC2 Instance
+reference link https://github.com/machulav/ec2-github-runner
+We have Install docker and github on the EC2 Instance successfully 
+
+Next Creating an Amazon Machine Image AMI and Terminating the EC2 Instance
+Select your EC2 instance and click action scroll to Image and Templates Click Create Image
+Give Image name = Github Action Runner
+Give Image description = Github Action Runner
+Instance volumes 
+Storage type Size = 20  # We change it to 20 so that our docker will have enough storage to run the job
+Tags =  Tag image and snapshots together
+Click add New Tag
+Key = Name
+Value = Github Action Runner
+
+Then click Create Image
+We have created AMI successfully 
+
+Next is to terminate ec2 instance
+
+Next Creating Github Actions Job to start a Self-Hosted Runner
+
+
+
 
 
 

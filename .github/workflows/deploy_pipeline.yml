@@ -1,130 +1,135 @@
+# Define the name of the GitHub Actions workflow
 name: Deploy Pipeline
 
+# Trigger the workflow on push events to the main branch
 on:
   push:
     branches: [main]
 
+# Set environment variables for AWS credentials and region
 env:
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_REGION: us-east-1
-  TERRAFORM_ACTION: apply  # Set default action to 'apply'. Change it as needed.
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }} # AWS Access Key ID from GitHub secrets
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }} # AWS Secret Access Key from GitHub secrets
+  AWS_REGION: us-east-1 # AWS region to deploy resources in
+  TERRAFORM_ACTION: apply  # Set default Terraform action to 'apply'. Change it as needed.
 
 jobs:
-  # Configure AWS credentials 
+  # Job to configure AWS credentials
   configure_aws_credentials:
     name: Configure AWS credentials
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner
     steps:
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v1-node16 # Use AWS credentials action
         with:
-          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }} # Provide AWS Access Key ID
+          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }} # Provide AWS Secret Access Key
+          aws-region: ${{ env.AWS_REGION }} # Provide AWS region
 
-  # Build AWS infrastructure
+  # Job to build AWS infrastructure using Terraform
   deploy_aws_infrastructure:
     name: Build AWS infrastructure
-    needs: configure_aws_credentials
-    runs-on: ubuntu-latest
+    needs: configure_aws_credentials # Ensure this job runs after AWS credentials are configured
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3 # Checkout the repository to the runner
 
       - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v2 # Set up Terraform CLI
         with:
-          terraform_version: 1.1.7
+          terraform_version: 1.1.7 # Specify the Terraform version to use
 
       - name: Run Terraform initialize
-        working-directory: ./iac
-        run: terraform init
+        working-directory: ./iac # Specify the directory containing Terraform configuration
+        run: terraform init # Initialize Terraform configuration
 
       - name: Run Terraform apply/destroy
-        working-directory: ./iac
-        run: terraform ${{ env.TERRAFORM_ACTION }} -auto-approve
+        working-directory: ./iac # Specify the directory containing Terraform configuration
+        run: terraform ${{ env.TERRAFORM_ACTION }} -auto-approve # Apply or destroy Terraform configuration based on the action
 
+      # Steps to retrieve and set Terraform outputs as environment variables
       - name: Get Terraform output image name
-        if: ${{ env.TERRAFORM_ACTION == 'apply' }}
-        working-directory: ./iac
+        if: ${{ env.TERRAFORM_ACTION == 'apply' }} # Only run if the action is 'apply'
+        working-directory: ./iac # Specify the directory containing Terraform configuration
         run: |
-          IMAGE_NAME_VALUE=$(terraform output -raw image_name | grep -Eo "^[^:]+" | tail -n 1)
-          echo "IMAGE_NAME=$IMAGE_NAME_VALUE" >> $GITHUB_ENV
+          IMAGE_NAME_VALUE=$(terraform output -raw image_name | grep -Eo "^[^:]+" | tail -n 1) # Get the 'image_name' output from Terraform
+          echo "IMAGE_NAME=$IMAGE_NAME_VALUE" >> $GITHUB_ENV # Set 'IMAGE_NAME' as an environment variable
 
       - name: Get Terraform output domain name
-        if: ${{ env.TERRAFORM_ACTION == 'apply' }}
-        working-directory: ./iac
+        if: ${{ env.TERRAFORM_ACTION == 'apply' }} # Only run if the action is 'apply'
+        working-directory: ./iac # Specify the directory containing Terraform configuration
         run: |
-          DOMAIN_NAME_VALUE=$(terraform output -raw domain_name | grep -Eo "^[^:]+" | tail -n 1)
-          echo "DOMAIN_NAME=$DOMAIN_NAME_VALUE" >> $GITHUB_ENV
+          DOMAIN_NAME_VALUE=$(terraform output -raw domain_name | grep -Eo "^[^:]+" | tail -n 1) # Get the 'domain_name' output from Terraform
+          echo "DOMAIN_NAME=$DOMAIN_NAME_VALUE" >> $GITHUB_ENV # Set 'DOMAIN_NAME' as an environment variable
 
       - name: Get Terraform output RDS endpoint
-        if: ${{ env.TERRAFORM_ACTION == 'apply' }}
-        working-directory: ./iac
+        if: ${{ env.TERRAFORM_ACTION == 'apply' }} # Only run if the action is 'apply'
+        working-directory: ./iac # Specify the directory containing Terraform configuration
         run: |
-          RDS_ENDPOINT_VALUE=$(terraform output -raw rds_endpoint | grep -Eo "^[^:]+" | tail -n 1)
-          echo "RDS_ENDPOINT=$RDS_ENDPOINT_VALUE" >> $GITHUB_ENV
+          RDS_ENDPOINT_VALUE=$(terraform output -raw rds_endpoint | grep -Eo "^[^:]+" | tail -n 1) # Get the 'rds_endpoint' output from Terraform
+          echo "RDS_ENDPOINT=$RDS_ENDPOINT_VALUE" >> $GITHUB_ENV # Set 'RDS_ENDPOINT' as an environment variable
 
       - name: Get Terraform output image tag
-        if: ${{ env.TERRAFORM_ACTION == 'apply' }}
-        working-directory: ./iac
+        if: ${{ env.TERRAFORM_ACTION == 'apply' }} # Only run if the action is 'apply'
+        working-directory: ./iac # Specify the directory containing Terraform configuration
         run: |
-          IMAGE_TAG_VALUE=$(terraform output -raw image_tag | grep -Eo "^[^:]+" | tail -n 1)
-          echo "IMAGE_TAG=$IMAGE_TAG_VALUE" >> $GITHUB_ENV
+          IMAGE_TAG_VALUE=$(terraform output -raw image_tag | grep -Eo "^[^:]+" | tail -n 1) # Get the 'image_tag' output from Terraform
+          echo "IMAGE_TAG=$IMAGE_TAG_VALUE" >> $GITHUB_ENV # Set 'IMAGE_TAG' as an environment variable
 
       - name: Get Terraform output private data subnet az1 id
-        if: ${{ env.TERRAFORM_ACTION == 'apply' }}
-        working-directory: ./iac
+        if: ${{ env.TERRAFORM_ACTION == 'apply' }} # Only run if the action is 'apply'
+        working-directory: ./iac # Specify the directory containing Terraform configuration
         run: |
-          PRIVATE_DATA_SUBNET_AZ1_ID_VALUE=$(terraform output -raw private_data_subnet_az1_id | grep -Eo "^[^:]+" | tail -n 1)
-          echo "PRIVATE_DATA_SUBNET_AZ1_ID=$PRIVATE_DATA_SUBNET_AZ1_ID_VALUE" >> $GITHUB_ENV
+          PRIVATE_DATA_SUBNET_AZ1_ID_VALUE=$(terraform output -raw private_data_subnet_az1_id | grep -Eo "^[^:]+" | tail -n 1) # Get the 'private_data_subnet_az1_id' output from Terraform
+          echo "PRIVATE_DATA_SUBNET_AZ1_ID=$PRIVATE_DATA_SUBNET_AZ1_ID_VALUE" >> $GITHUB_ENV # Set 'PRIVATE_DATA_SUBNET_AZ1_ID' as an environment variable
 
       - name: Get Terraform output runner security group id
-        if: ${{ env.TERRAFORM_ACTION == 'apply' }}
-        working-directory: ./iac
+        if: ${{ env.TERRAFORM_ACTION == 'apply' }} # Only run if the action is 'apply'
+        working-directory: ./iac # Specify the directory containing Terraform configuration
         run: |
-          RUNNER_SECURITY_GROUP_ID_VALUE=$(terraform output -raw runner_security_group_id | grep -Eo "^[^:]+" | tail -n 1)
-          echo "RUNNER_SECURITY_GROUP_ID=$RUNNER_SECURITY_GROUP_ID_VALUE" >> $GITHUB_ENV
+          RUNNER_SECURITY_GROUP_ID_VALUE=$(terraform output -raw runner_security_group_id | grep -Eo "^[^:]+" | tail -n 1) # Get the 'runner_security_group_id' output from Terraform
+          echo "RUNNER_SECURITY_GROUP_ID=$RUNNER_SECURITY_GROUP_ID_VALUE" >> $GITHUB_ENV # Set 'RUNNER_SECURITY_GROUP_ID' as an environment variable
 
       - name: Get Terraform output task definition name
-        if: ${{ env.TERRAFORM_ACTION == 'apply' }}
-        working-directory: ./iac
+        if: ${{ env.TERRAFORM_ACTION == 'apply' }} # Only run if the action is 'apply'
+        working-directory: ./iac # Specify the directory containing Terraform configuration
         run: |
-          TASK_DEFINITION_NAME_VALUE=$(terraform output -raw task_definition_name | grep -Eo "^[^:]+" | tail -n 1)
-          echo "TASK_DEFINITION_NAME=$TASK_DEFINITION_NAME_VALUE" >> $GITHUB_ENV
+          TASK_DEFINITION_NAME_VALUE=$(terraform output -raw task_definition_name | grep -Eo "^[^:]+" | tail -n 1) # Get the 'task_definition_name' output from Terraform
+          echo "TASK_DEFINITION_NAME=$TASK_DEFINITION_NAME_VALUE" >> $GITHUB_ENV # Set 'TASK_DEFINITION_NAME' as an environment variable
 
       - name: Get Terraform output ecs cluster name
-        if: ${{ env.TERRAFORM_ACTION == 'apply' }}
-        working-directory: ./iac
+        if: ${{ env.TERRAFORM_ACTION == 'apply' }} # Only run if the action is 'apply'
+        working-directory: ./iac # Specify the directory containing Terraform configuration
         run: |
-          ECS_CLUSTER_NAME_VALUE=$(terraform output -raw ecs_cluster_name | grep -Eo "^[^:]+" | tail -n 1)
-          echo "ECS_CLUSTER_NAME=$ECS_CLUSTER_NAME_VALUE" >> $GITHUB_ENV
+          ECS_CLUSTER_NAME_VALUE=$(terraform output -raw ecs_cluster_name | grep -Eo "^[^:]+" | tail -n 1) # Get the 'ecs_cluster_name' output from Terraform
+          echo "ECS_CLUSTER_NAME=$ECS_CLUSTER_NAME_VALUE" >> $GITHUB_ENV # Set 'ECS_CLUSTER_NAME' as an environment variable
 
       - name: Get Terraform output ecs service name
-        if: ${{ env.TERRAFORM_ACTION == 'apply' }}
-        working-directory: ./iac
+        if: ${{ env.TERRAFORM_ACTION == 'apply' }} # Only run if the action is 'apply'
+        working-directory: ./iac # Specify the directory containing Terraform configuration
         run: |
-          ECS_SERVICE_NAME_VALUE=$(terraform output -raw ecs_service_name | grep -Eo "^[^:]+" | tail -n 1)
-          echo "ECS_SERVICE_NAME=$ECS_SERVICE_NAME_VALUE" >> $GITHUB_ENV
+          ECS_SERVICE_NAME_VALUE=$(terraform output -raw ecs_service_name | grep -Eo "^[^:]+" | tail -n 1) # Get the 'ecs_service_name' output from Terraform
+          echo "ECS_SERVICE_NAME=$ECS_SERVICE_NAME_VALUE" >> $GITHUB_ENV # Set 'ECS_SERVICE_NAME' as an environment variable
 
       - name: Get Terraform output environment file name
-        if: ${{ env.TERRAFORM_ACTION == 'apply' }}
-        working-directory: ./iac
+        if: ${{ env.TERRAFORM_ACTION == 'apply' }} # Only run if the action is 'apply'
+        working-directory: ./iac # Specify the directory containing Terraform configuration
         run: |
-          ENVIRONMENT_FILE_NAME_VALUE=$(terraform output -raw environment_file_name | grep -Eo "^[^:]+" | tail -n 1)
-          echo "ENVIRONMENT_FILE_NAME=$ENVIRONMENT_FILE_NAME_VALUE" >> $GITHUB_ENV
+          ENVIRONMENT_FILE_NAME_VALUE=$(terraform output -raw environment_file_name | grep -Eo "^[^:]+" | tail -n 1) # Get the 'environment_file_name' output from Terraform
+          echo "ENVIRONMENT_FILE_NAME=$ENVIRONMENT_FILE_NAME_VALUE" >> $GITHUB_ENV # Set 'ENVIRONMENT_FILE_NAME' as an environment variable
 
       - name: Get Terraform output env file bucket name
-        if: ${{ env.TERRAFORM_ACTION == 'apply' }}
-        working-directory: ./iac
+        if: ${{ env.TERRAFORM_ACTION == 'apply' }} # Only run if the action is 'apply'
+        working-directory: ./iac # Specify the directory containing Terraform configuration
         run: |
-          ENV_FILE_BUCKET_NAME_VALUE=$(terraform output -raw env_file_bucket_name | grep -Eo "^[^:]+" | tail -n 1)
-          echo "ENV_FILE_BUCKET_NAME=$ENV_FILE_BUCKET_NAME_VALUE" >> $GITHUB_ENV
+          ENV_FILE_BUCKET_NAME_VALUE=$(terraform output -raw env_file_bucket_name | grep -Eo "^[^:]+" | tail -n 1) # Get the 'env_file_bucket_name' output from Terraform
+          echo "ENV_FILE_BUCKET_NAME=$ENV_FILE_BUCKET_NAME_VALUE" >> $GITHUB_ENV # Set 'ENV_FILE_BUCKET_NAME' as an environment variable
 
       - name: Print GITHUB_ENV contents
-        run: cat $GITHUB_ENV
+        run: cat $GITHUB_ENV # Print the contents of the GITHUB_ENV file to verify the environment variables
 
+    # Set the outputs of this job to be used by other jobs
     outputs:
       terraform_action: ${{ env.TERRAFORM_ACTION }}
       image_name: ${{ env.IMAGE_NAME }}
@@ -139,35 +144,70 @@ jobs:
       environment_file_name: ${{ env.ENVIRONMENT_FILE_NAME }}
       env_file_bucket_name: ${{ env.ENV_FILE_BUCKET_NAME }}
 
-
-  # Create ECR repository
+  # Job to create an ECR repository
   create_ecr_repository:
     name: Create ECR repository
     needs: 
-      - configure_aws_credentials
-      - deploy_aws_infrastructure
-    if: needs.deploy_aws_infrastructure.outputs.terraform_action != 'destroy'
-    runs-on: ubuntu-latest
+      - configure_aws_credentials # Ensure this job runs after AWS credentials are configured
+      - deploy_aws_infrastructure # Ensure this job runs after the infrastructure is deployed
+    if: needs.deploy_aws_infrastructure.outputs.terraform_action != 'destroy' # Only run if the Terraform action is not 'destroy'
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3 # Checkout the repository to the runner
 
       - name: Check if ECR repository exists
         env:
-          IMAGE_NAME: ${{ needs.deploy_aws_infrastructure.outputs.image_name }}
+          IMAGE_NAME: ${{ needs.deploy_aws_infrastructure.outputs.image_name }} # Use the 'image_name' output from the previous job
         run: |
-          result=$(aws ecr describe-repositories --repository-names "${{ env.IMAGE_NAME }}" | jq -r '.repositories[0].repositoryName')
-          echo "repo_name=$result" >> $GITHUB_ENV
-        continue-on-error: true
+          result=$(aws ecr describe-repositories --repository-names "${{ env.IMAGE_NAME }}" | jq -r '.repositories[0].repositoryName') # Check if the ECR repository exists
+          echo "repo_name=$result" >> $GITHUB_ENV # Set 'repo_name' as an environment variable
+        continue-on-error: true # Continue even if the command fails
 
       - name: Create ECR repository
         env:
-          IMAGE_NAME: ${{ needs.deploy_aws_infrastructure.outputs.image_name }}
-        if: env.repo_name != env.IMAGE_NAME
+          IMAGE_NAME: ${{ needs.deploy_aws_infrastructure.outputs.image_name }} # Use the 'image_name' output from the previous job
+        if: env.repo_name != env.IMAGE_NAME # Only create the repository if it doesn't already exist
         run: |
-          aws ecr create-repository --repository-name ${{ env.IMAGE_NAME }}
+          aws ecr create-repository --repository-name ${{ env.IMAGE_NAME }} # Create the ECR repository
 
 
+ # Start self-hosted EC2 runner
+ start_runner:
+    name: Start self-hosted EC2 runner
+    needs: 
+      - configure_aws_credentials
+      - deploy_aws_infrastructure
+    if: needs.deploy_aws_infrastructure.outputs.terraform_action != 'destroy' # Only run if the Terraform action is not 'destroy'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for running EC2 runner
+        run: |
+          instances=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=ec2-github-runner" "Name=instance-state-name,Values=running" --query 'Reservations[].Instances[].InstanceId' --output text)
 
-          
+          if [ -n "$instances" ]; then
+            echo "runner-running=true" >> $GITHUB_ENV
+          else
+            echo "runner-running=false" >> $GITHUB_ENV
+          fi
 
+      - name: Start EC2 runner
+        if: env.runner-running != 'true'
+        id: start-ec2-runner
+        uses: machulav/ec2-github-runner@v2
+        with:
+          mode: start
+          github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          ec2-image-id: ami-09551da0c05c4f643
+          ec2-instance-type: t2.micro
+          subnet-id: ${{ needs.deploy_aws_infrastructure.outputs.private_data_subnet_az1_id }}
+          security-group-id: ${{ needs.deploy_aws_infrastructure.outputs.runner_security_group_id }}
+          aws-resource-tags: > 
+            [
+              {"Key": "Name", "Value": "ec2-github-runner"},
+              {"Key": "GitHubRepository", "Value": "${{ github.repository }}"}
+            ]
+
+    outputs:
+      label: ${{ steps.start-ec2-runner.outputs.label }}
+      ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
