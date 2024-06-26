@@ -30,6 +30,8 @@ Copy the reference file configure_aws_credentials_reference from aosnote and pas
 AWS Credentials configure seccessfully 
 
 Next Creating a Github Actions Job to Deploy AWS Infrastructure to apply our terraform code
+AWS Infrastructure apply successfully through Github Actions
 
+Next Creating a Github Actions Job to Destroy AWS Infrastructure we just deploy
 
 
