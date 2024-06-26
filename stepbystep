@@ -79,6 +79,9 @@ copy the build docker image variables from aos note and paste it into deploy_pip
 
 Next copy the build_and_push_image_reference from aos note and paste it into deploy_pipeline
 
+Next Create a Github Actions Job to Export the Environment Variables into the S3 bucket
+To do that copy the export_env_variables_reference from aos note and paste it into deploy_pipeline
+
 
 
 
