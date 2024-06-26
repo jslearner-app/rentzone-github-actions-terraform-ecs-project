@@ -32,10 +32,13 @@ RUN amazon-linux-extras enable php7.4 && \
     php-intl \
     php-zip
 
-# Enable MySQL 5.7 through amazon-linux-extras and install
+# Enable MySQL 5.7 through amazon-linux-extras and install MySQL client
 RUN amazon-linux-extras enable mysql57 && \
     yum clean metadata && \
-    yum install -y mysql-community-server
+    yum install -y mysql
+
+# Install MySQL server directly from mysql57 package
+RUN yum install -y mysql-server
 
 # Change directory to the html directory
 WORKDIR /var/www/html
@@ -85,7 +88,7 @@ RUN sed -i '/^DB_PASSWORD=/ s/=.*$/="your_rds_db_password"/' .env
 # Copy the file, AppServiceProvider.php from the host file system into the container at the path app/Providers/AppServiceProvider.php
 COPY AppServiceProvider.php app/Providers/AppServiceProvider.php
 
-# Expose the default Apache and MySQL portss
+# Expose the default Apache and MySQL ports
 EXPOSE 80 3306
 
 # Start Apache and MySQL
