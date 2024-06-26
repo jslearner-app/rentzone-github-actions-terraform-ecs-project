@@ -36,7 +36,8 @@ RUN rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql-2022
 RUN yum localinstall mysql80-community-release-el7-3.noarch.rpm -y
 
 # Install the MySQL community server package
-RUN yum install mysql-community-server -y
+RUN yum install mysql-community-server
+
 
 # Change directory to the html directory
 WORKDIR /var/www/html
