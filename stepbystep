@@ -5,5 +5,8 @@ Add terraform code into the repository iac folder reference
 Create a secrete in aws secrete manager to add value to our rds database
 Update backend.tf file to store our terraform statefile on s3 bucket
 Filling out the value in the terraform.tfvars file
+Running the Terraform Apply command to test the terraform code
+our terraform code work correctly
+We need to destroy it 
 
 
