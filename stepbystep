@@ -8,5 +8,23 @@ Filling out the value in the terraform.tfvars file
 Running the Terraform Apply command to test the terraform code
 our terraform code work correctly
 We need to destroy it 
+Start to build the CICD Pipeline in Github Actions
+Creating a Github Personal Access Token
+Creating github Repository Secrets
+open our rentzone repository in github and click setting scroll down and click secrets and variables select Actions
+and click New Repository Secret add the bellow information and their value to the Repository Secret
+# AWS_ACCESS_KEY_ID
+# AWS_SECRET_ACCESS_KEY
+# ECR_REGISTRY
+# PERSONAL_ACCESS_TOKEN
+# RDS_DB_NAME
+# RDS_DB_PASSWORD
+# RDS_DB_USERNAME
 
+Now Creating a Github Actions Workflow File
+Create a new folder called it .github after that right click on .github folder and click new folder and name it workflows.
+Next right click on workflows folder and click new file then nema it deploy_pipeline.yml
+
+Next Creating a Github Actions Job to Configure AWS Credentials
+Copy the reference file configure_aws_credentials_reference from aosnote and paste it into deploy_pipeline file.
 
