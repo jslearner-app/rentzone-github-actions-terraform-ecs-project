@@ -207,8 +207,8 @@ jobs:
           security-group-id: ${{ needs.deploy_aws_infrastructure.outputs.runner_security_group_id }} # Use the security group ID output from the deploy job
           aws-resource-tags: > 
             [
-              {"Key": "Name", "Value": "ec2-github-runner"}, # Tag the instance with a name
-              {"Key": "GitHubRepository", "Value": "${{ github.repository }}"} # Tag the instance with the GitHub repository name
+              {"Key": "Name", "Value": "ec2-github-runner"},
+              {"Key": "GitHubRepository", "Value": "${{ github.repository }}"} 
             ]
   
     outputs:
