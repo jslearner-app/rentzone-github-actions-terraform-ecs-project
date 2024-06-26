@@ -1,4 +1,9 @@
 Create github repository to store our application code
 Clone the github repository to our pc
 Open the repository with VS and update the .gitignore file with the reference.
-Add terraform code into the repository
+Add terraform code into the repository iac folder reference
+Create a secrete in aws secrete manager to add value to our rds database
+Update backend.tf file to store our terraform statefile on s3 bucket
+Filling out the value in the terraform.tfvars file
+
+
