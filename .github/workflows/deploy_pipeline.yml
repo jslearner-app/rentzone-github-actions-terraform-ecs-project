@@ -172,42 +172,46 @@ jobs:
           aws ecr create-repository --repository-name ${{ env.IMAGE_NAME }} # Create the ECR repository
 
 
- # Start self-hosted EC2 runner
- start_runner:
+ # Start self-hosted EC2 runner job
+start_runner:
     name: Start self-hosted EC2 runner
     needs: 
-      - configure_aws_credentials
-      - deploy_aws_infrastructure
+      - configure_aws_credentials # Ensure this job runs after AWS credentials are configured
+      - deploy_aws_infrastructure # Ensure this job runs after the infrastructure is deployed
     if: needs.deploy_aws_infrastructure.outputs.terraform_action != 'destroy' # Only run if the Terraform action is not 'destroy'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner
+  
     steps:
       - name: Check for running EC2 runner
         run: |
+          # Describe instances with the specified tags and state to check if any runner is already running
           instances=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=ec2-github-runner" "Name=instance-state-name,Values=running" --query 'Reservations[].Instances[].InstanceId' --output text)
-
+  
+          # If there are running instances, set the runner-running environment variable to true, otherwise false
           if [ -n "$instances" ]; then
             echo "runner-running=true" >> $GITHUB_ENV
           else
             echo "runner-running=false" >> $GITHUB_ENV
           fi
-
+  
       - name: Start EC2 runner
-        if: env.runner-running != 'true'
+        if: env.runner-running != 'true' # Only start a new runner if there is no existing running runner
         id: start-ec2-runner
-        uses: machulav/ec2-github-runner@v2
+        uses: machulav/ec2-github-runner@v2 # Use the ec2-github-runner action
         with:
-          mode: start
-          github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          ec2-image-id: ami-09551da0c05c4f643
-          ec2-instance-type: t2.micro
-          subnet-id: ${{ needs.deploy_aws_infrastructure.outputs.private_data_subnet_az1_id }}
-          security-group-id: ${{ needs.deploy_aws_infrastructure.outputs.runner_security_group_id }}
+          mode: start # Start the EC2 instance
+          github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }} # Use a personal access token from secrets
+          ec2-image-id: ami-09551da0c05c4f643 # Specify the AMI ID for the EC2 instance
+          ec2-instance-type: t2.micro # Specify the instance type
+          subnet-id: ${{ needs.deploy_aws_infrastructure.outputs.private_data_subnet_az1_id }} # Use the subnet ID output from the deploy job
+          security-group-id: ${{ needs.deploy_aws_infrastructure.outputs.runner_security_group_id }} # Use the security group ID output from the deploy job
           aws-resource-tags: > 
             [
-              {"Key": "Name", "Value": "ec2-github-runner"},
-              {"Key": "GitHubRepository", "Value": "${{ github.repository }}"}
+              {"Key": "Name", "Value": "ec2-github-runner"}, # Tag the instance with a name
+              {"Key": "GitHubRepository", "Value": "${{ github.repository }}"} # Tag the instance with the GitHub repository name
             ]
-
+  
     outputs:
-      label: ${{ steps.start-ec2-runner.outputs.label }}
-      ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
+      label: ${{ steps.start-ec2-runner.outputs.label }} # Output the label of the runner
+      ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }} # Output the instance ID of the EC2 runner
+  
