@@ -32,13 +32,31 @@ RUN amazon-linux-extras enable php7.4 && \
     php-intl \
     php-zip
 
-# Enable MySQL 5.7 through amazon-linux-extras and install MySQL client
-RUN amazon-linux-extras enable mysql57 && \
-    yum clean metadata && \
-    yum install -y mysql
+# Install dependencies for MySQL .deb packages
+RUN yum install -y libaio libnuma
 
-# Install MySQL server directly from mysql57 package
-RUN yum install -y mysql-server
+# Download MySQL .deb packages
+RUN wget https://dev.mysql.com/get/mysql-apt-config_0.8.15-1_all.deb && \
+    dpkg -i mysql-apt-config_0.8.15-1_all.deb && \
+    apt-get update && \
+    wget https://dev.mysql.com/get/mysql-common_8.0.26-1ubuntu20.04_amd64.deb && \
+    wget https://dev.mysql.com/get/mysql-community-client-plugins_8.0.26-1ubuntu20.04_amd64.deb && \
+    wget https://dev.mysql.com/get/mysql-community-client-core_8.0.26-1ubuntu20.04_amd64.deb && \
+    wget https://dev.mysql.com/get/mysql-community-client_8.0.26-1ubuntu20.04_amd64.deb && \
+    wget https://dev.mysql.com/get/mysql-client_8.0.26-1ubuntu20.04_amd64.deb && \
+    wget https://dev.mysql.com/get/mysql-community-server-core_8.0.26-1ubuntu20.04_amd64.deb && \
+    wget https://dev.mysql.com/get/mysql-community-server_8.0.26-1ubuntu20.04_amd64.deb && \
+    wget https://dev.mysql.com/get/mysql-server_8.0.26-1ubuntu20.04_amd64.deb
+
+# Install MySQL using .deb packages
+RUN dpkg -i mysql-common_8.0.26-1ubuntu20.04_amd64.deb && \
+    dpkg -i mysql-community-client-plugins_8.0.26-1ubuntu20.04_amd64.deb && \
+    dpkg -i mysql-community-client-core_8.0.26-1ubuntu20.04_amd64.deb && \
+    dpkg -i mysql-community-client_8.0.26-1ubuntu20.04_amd64.deb && \
+    dpkg -i mysql-client_8.0.26-1ubuntu20.04_amd64.deb && \
+    dpkg -i mysql-community-server-core_8.0.26-1ubuntu20.04_amd64.deb && \
+    dpkg -i mysql-community-server_8.0.26-1ubuntu20.04_amd64.deb && \
+    dpkg -i mysql-server_8.0.26-1ubuntu20.04_amd64.deb
 
 # Change directory to the html directory
 WORKDIR /var/www/html
