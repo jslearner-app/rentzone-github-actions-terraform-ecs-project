@@ -27,4 +27,9 @@ Next right click on workflows folder and click new file then nema it deploy_pipe
 
 Next Creating a Github Actions Job to Configure AWS Credentials
 Copy the reference file configure_aws_credentials_reference from aosnote and paste it into deploy_pipeline file.
+AWS Credentials configure seccessfully 
+
+Next Creating a Github Actions Job to Deploy AWS Infrastructure to apply our terraform code
+
+
 
