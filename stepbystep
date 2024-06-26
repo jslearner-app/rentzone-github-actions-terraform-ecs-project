@@ -37,5 +37,9 @@ Next Creating a Github Actions Job to Destroy AWS Infrastructure we just deploy
 Next Creating  a Github Actions Job to create an amazon ECR Repository
 copy the reference file in aosnote and paste it in Deploy_pipeline file
 
+Next creating a Self-Hosted Runner
+firsly launch an Amazon Linux 2 EC2 Instance in public subnet use the default vpc in the Management Console.
+
+
 
 
