@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest # Use the latest Ubuntu runner
     steps:
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16 # Use AWS credentials action
+        uses: aws-actions/configure-aws-credentials@v2 # Use AWS credentials action
         with:
           aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }} # Provide AWS Access Key ID
           aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }} # Provide AWS Secret Access Key
@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest # Use the latest Ubuntu runner
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3 # Checkout the repository to the runner
+        uses: actions/checkout@v4 # Checkout the repository to the runner
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2 # Set up Terraform CLI
@@ -143,7 +143,7 @@ jobs:
     runs-on: ubuntu-latest # Use the latest Ubuntu runner
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3 # Checkout the repository to the runner
+        uses: actions/checkout@v4 # Checkout the repository to the runner
 
       - name: Check if ECR repository exists
         env:
