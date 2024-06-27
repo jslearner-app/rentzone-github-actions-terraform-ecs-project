@@ -89,6 +89,9 @@ Next Terminate the Self-Hosted Runner in the AWS Management Console
 Next Create a Github Actions Job to stop the Self-Hosted Runner
 copy the reference from aos note and paste it into deploy_pipeline
 
+Next Create a Github Actions Job to Create a New ECS Task Definition
+copy create_td_revision reference from aos note and paste it into deploy_pipeline
+
 
 
 
