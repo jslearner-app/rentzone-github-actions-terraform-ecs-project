@@ -11,7 +11,7 @@ env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }} # AWS Access Key ID from GitHub secrets
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }} # AWS Secret Access Key from GitHub secrets
   AWS_REGION: us-east-1 # AWS region to deploy resources in
-  TERRAFORM_ACTION: destroy #apply  # Set default Terraform action to 'apply'. Change it as needed.
+  TERRAFORM_ACTION: apply  # Set default Terraform action to 'apply'. Change it as needed.
   GITHUB_USERNAME: jslearner-app
   REPOSITORY_NAME: rentzone-application-code-cicd
   WEB_FILE_ZIP: rentzone.zip
