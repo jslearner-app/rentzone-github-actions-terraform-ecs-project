@@ -144,7 +144,7 @@ jobs:
     needs: 
       - configure_aws_credentials # Ensure this job runs after AWS credentials are configured
       - deploy_aws_infrastructure # Ensure this job runs after the infrastructure is deployed
-    if: needs.deploy_aws_infrastructure.outputs.terraform_action != 'destroy' # Only run if the Terraform action is not 'destroy'
+    if: needs.deploy_aws_infrastructure.outputs.terraform_action == 'destroy' # Only run if the Terraform action is not 'destroy'
     runs-on: ubuntu-latest # Use the latest Ubuntu runner
     steps:
       - name: Checkout repository
@@ -170,7 +170,7 @@ jobs:
     needs: 
       - configure_aws_credentials # Ensure this job runs after AWS credentials are configured
       - deploy_aws_infrastructure # Ensure this job runs after the infrastructure is deployed
-    if: needs.deploy_aws_infrastructure.outputs.terraform_action != 'destroy' # Only run if the Terraform action is not 'destroy'
+    if: needs.deploy_aws_infrastructure.outputs.terraform_action == 'destroy' # Only run if the Terraform action is not 'destroy'
     runs-on: ubuntu-latest # Use the latest Ubuntu runner
   
     steps:
@@ -187,7 +187,7 @@ jobs:
           fi
   
       - name: Start EC2 runner
-        if: env.runner-running != 'true' # Only start a new runner if there is no existing running runner
+        if: env.runner-running == 'true' # Only start a new runner if there is no existing running runner
         id: start-ec2-runner
         uses: machulav/ec2-github-runner@v2 # Use the ec2-github-runner action
         with:
@@ -215,7 +215,7 @@ jobs:
       - deploy_aws_infrastructure
       - create_ecr_repository
       - start_runner
-    if: needs.deploy_aws_infrastructure.outputs.terraform_action != 'destroy'
+    if: needs.deploy_aws_infrastructure.outputs.terraform_action == 'destroy'
     runs-on: self-hosted
     steps:
       - name: Checkout repository
@@ -261,7 +261,7 @@ jobs:
       - deploy_aws_infrastructure
       - start_runner
       - build_and_push_image
-    if: needs.deploy_aws_infrastructure.outputs.terraform_action != 'destroy'
+    if: needs.deploy_aws_infrastructure.outputs.terraform_action == 'destroy'
     runs-on: ubuntu-latest
     steps:
       - name: Export environment variable values to file
@@ -295,7 +295,7 @@ jobs:
       - deploy_aws_infrastructure
       - start_runner
       - build_and_push_image
-    if: needs.deploy_aws_infrastructure.outputs.terraform_action != 'destroy'
+    if: needs.deploy_aws_infrastructure.outputs.terraform_action == 'destroy'
     runs-on: self-hosted
     steps:
       - name: Checkout repository
@@ -332,7 +332,7 @@ jobs:
       - build_and_push_image
       - export_env_variables
       - migrate_data
-    if: needs.deploy_aws_infrastructure.outputs.terraform_action != 'destroy' && always() 
+    if: needs.deploy_aws_infrastructure.outputs.terraform_action == 'destroy' && always() 
     runs-on: ubuntu-latest
     steps:
       - name: Stop EC2 runner
@@ -356,7 +356,7 @@ jobs:
       - export_env_variables
       - migrate_data
       - stop_runner
-    if: needs.deploy_aws_infrastructure.outputs.terraform_action != 'destroy'
+    if: needs.deploy_aws_infrastructure.outputs.terraform_action == 'destroy'
     runs-on: ubuntu-latest
     steps:
       - name: Create new task definition revision
@@ -394,7 +394,7 @@ jobs:
       - migrate_data
       - stop_runner
       - create_td_revision
-    if: needs.deploy_aws_infrastructure.outputs.terraform_action != 'destroy'
+    if: needs.deploy_aws_infrastructure.outputs.terraform_action == 'destroy'
     runs-on: ubuntu-latest
     steps:
       - name: Update ECS Service
