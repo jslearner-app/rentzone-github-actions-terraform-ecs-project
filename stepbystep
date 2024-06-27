@@ -82,6 +82,9 @@ Next copy the build_and_push_image_reference from aos note and paste it into dep
 Next Create a Github Actions Job to Export the Environment Variables into the S3 bucket
 To do that copy the export_env_variables_reference from aos note and paste it into deploy_pipeline
 
+Next Create the SQL Folder and Adding the SQL Script from aos note into it
+Next Create a Github Actions Job to migrate Data into the RDS Database with Flyway
+
 
 
 
