@@ -92,6 +92,9 @@ copy the reference from aos note and paste it into deploy_pipeline
 Next Create a Github Actions Job to Create a New ECS Task Definition
 copy create_td_revision reference from aos note and paste it into deploy_pipeline
 
+Final Job
+Next Create Github Actions Job to Restart the ECS Fargate Service
+
 
 
 
