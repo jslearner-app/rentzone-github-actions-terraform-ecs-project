@@ -85,6 +85,9 @@ To do that copy the export_env_variables_reference from aos note and paste it in
 Next Create the SQL Folder and Adding the SQL Script from aos note into it
 Next Create a Github Actions Job to migrate Data into the RDS Database with Flyway
 
+Next Terminate the Self-Hosted Runner in the AWS Management Console 
+Next Create a Github Actions Job to stop the Self-Hosted Runner
+copy the reference from aos note and paste it into deploy_pipeline
 
 
 
